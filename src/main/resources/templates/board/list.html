@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>게시글 목록</title>
+    <link rel="stylesheet" th:href="@{/css/board.css}" href="/css/board.css" />
+</head>
+<body>
+<div class="board-container">
+    <script th:if="${message}" th:inline="javascript">alert([[${message}]]);</script>
+
+    <div class="board-header">
+        <h1 class="board-title">게시판</h1>
+        <p class="board-desc">게시글 목록을 확인하고 검색할 수 있습니다.</p>
+    </div>
+
+    <div class="board-controls">
+        <form class="page-size-form" th:action="${(keyword != null and !#strings.isEmpty(keyword))} ? @{/board/search} : @{/board/list}" method="get">
+            <input type="hidden" name="page" value="1"/>
+            <input type="hidden" name="type" th:if="${keyword != null and !#strings.isEmpty(keyword)}" th:value="${searchType}"/>
+            <input type="hidden" name="keyword" th:if="${keyword != null and !#strings.isEmpty(keyword)}" th:value="${keyword}"/>
+
+            <select id="sizeSelect" name="size" class="input size-select compact" onchange="this.form.submit()">
+                <option th:value="5" th:selected="${boards != null} and ${boards.size} == 5">5</option>
+                <option th:value="10" th:selected="${boards != null} and ${boards.size} == 10">10</option>
+                <option th:value="20" th:selected="${boards != null} and ${boards.size} == 20">20</option>
+                <option th:value="50" th:selected="${boards != null} and ${boards.size} == 50">50</option>
+            </select>
+            <span class="size-label"> 개씩보기</span>
+        </form>
+
+        <form th:action="@{/board/search}" method="get" class="board-search">
+            <div class="form-col select-col">
+                <select name="type" class="input">
+                    <option value="title" th:selected="${searchType == 'title'}">제목</option>
+                    <option value="name" th:selected="${searchType == 'name'}">작성자</option>
+                </select>
+            </div>
+            <div class="form-col input-col">
+                <input type="text" name="keyword" th:value="${keyword}" class="input" placeholder="검색어를 입력하세요" />
+            </div>
+            <div class="form-col btn-col">
+                <button type="submit" class="btn">검색</button>
+            </div>
+        </form>
+    </div>
+
+    <table class="board-table">
+        <thead>
+            <tr>
+                <th class="num">번호</th>
+                <th>제목</th>
+                <th class="author">작성자</th>
+                <th class="date">작성일</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="board, stat : ${boards}">
+                <td class="num" th:text="${boards.totalElements - (boards.number * boards.size + stat.index)}">1</td>
+                <td>
+                    <a th:href="@{'/board/view?id=' + ${board.id}}" class="board-link" th:text="${board.title}">게시글 제목</a>
+                </td>
+                <td class="author" th:text="${board.name}">작성자</td>
+                <td class="date" th:text="${board.createdAt}">2025/10/21</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(boards)}">
+                <td colspan="4" class="center">등록된 게시글이 없습니다.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="btn-row">
+        <a class="btn" th:href="@{/board/writeForm}" href="/board/writeForm">게시글 등록</a>
+    </div>
+
+    <div class="pagination" th:if="${boards != null} and ${boards.totalPages} > 0">
+        <div th:if="${keyword} == null or ${#strings.isEmpty(keyword)}">
+            <a class="page-link"
+               th:classappend="${boards.first} ? ' disabled'"
+               th:href="@{'/board/list'(page=${boards.number}, size=${boards.size})}">&lt;</a>
+
+            <span th:each="i : ${#numbers.sequence(1, boards.totalPages)}">
+                <a class="page-link"
+                   th:text="${i}"
+                   th:classappend="${i-1} == ${boards.number} ? ' active'"
+                   th:href="@{'/board/list'(page=${i}, size=${boards.size})}">1</a>
+            </span>
+
+            <a class="page-link" th:classappend="${boards.last} ? ' disabled'"
+               th:href="@{'/board/list'(page=${boards.number + 2}, size=${boards.size})}">&gt;</a>
+        </div>
+
+        <div th:if="${keyword} != null and !${#strings.isEmpty(keyword)}">
+            <a class="page-link" th:classappend="${boards.first} ? ' disabled'"
+               th:href="@{'/board/search'(type=${searchType}, keyword=${keyword}, page=${boards.number}, size=${boards.size})}">&lt;</a>
+
+            <span th:each="i : ${#numbers.sequence(1, boards.totalPages)}">
+                <a class="page-link"
+                   th:text="${i}"
+                   th:classappend="${i-1} == ${boards.number} ? ' active'"
+                   th:href="@{'/board/search'(type=${searchType}, keyword=${keyword}, page=${i}, size=${boards.size})}">1</a>
+            </span>
+
+            <a class="page-link" th:classappend="${boards.last} ? ' disabled'"
+               th:href="@{'/board/search'(type=${searchType}, keyword=${keyword}, page=${boards.number + 2}, size=${boards.size})}">&gt;</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+
+
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>500 - 서버 내부 오류</title>
+    <link rel="stylesheet" th:href="@{/css/error.css}" href="/css/error.css" />
+</head>
+<body>
+<main class="err-container">
+    <section class="err-card">
+        <div class="err-code">500</div>
+        <h1 class="err-title">서버 내부 오류가 발생했습니다</h1>
+        <p class="err-desc">잠시 후 다시 시도해 주세요. 문제가 지속되면 관리자에게 문의해 주세요.</p>
+
+        <!--/*@thymesVar id="errorMessage" type="java.lang.String"*/-->
+        <div th:if="${errorMessage}" class="err-flash" th:text="${errorMessage}">에러 메시지</div>
+
+        <div class="err-actions">
+            <a class="btn" th:href="@{/board/list}" href="/board/list">목록으로</a>
+            <a class="btn outline" href="javascript:location.reload()">새로고침</a>
+        </div>
+    </section>
+
+    <footer class="err-foot">
+        <p class="muted">오류가 반복되면 서비스 운영팀에 알려 주세요.</p>
+    </footer>
+</main>
+</body>
+</html>

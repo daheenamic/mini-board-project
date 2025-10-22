@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>게시글 수정</title>
+    <link rel="stylesheet" th:href="@{/css/board.css}" href="/css/board.css" />
+</head>
+<body>
+<div class="board-container">
+    <script th:if="${message}" th:inline="javascript">alert([[${message}]]);</script>
+
+    <div class="board-header">
+        <h1 class="board-title">게시글 수정</h1>
+        <p class="board-desc">게시글 내용을 수정합니다.</p>
+    </div>
+
+    <div class="flash error" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{'/board/update'(id=${boardId})}" method="post" th:object="${board}" class="board-form">
+        <table class="form-table">
+            <tbody>
+                <tr>
+                    <th scope="row"><label for="name">작성자</label></th>
+                    <td>
+                        <input type="text" id="name" th:field="*{name}" placeholder="작성자 이름" class="input" />
+                        <div class="form-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="title">제목</label></th>
+                    <td>
+                        <input type="text" id="title" th:field="*{title}" placeholder="제목" class="input" />
+                        <div class="form-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="password">비밀번호</label></th>
+                    <td>
+                        <input type="password" id="password" th:field="*{password}" placeholder="수정 확인용 비밀번호" class="input" />
+                        <div class="form-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="content">내용</label></th>
+                    <td>
+                        <textarea id="content" th:field="*{content}" rows="10" placeholder="내용" class="textarea"></textarea>
+                        <div class="form-error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="btn-row">
+            <button type="submit" class="btn">수정</button>
+            <a th:href="@{'/board/view'(id=${boardId})}" href="/board/view" class="btn outline">취소</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

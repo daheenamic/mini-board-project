@@ -1,0 +1,276 @@
+/* ===============================
+   Board common theme (black & white)
+   Applies to: list / view / write / update / delete
+   =============================== */
+:root {
+  --text: #111;
+  --muted: #666;
+  --line: #e5e5e5;
+  --bg: #fff;
+  --bg-soft: #fafafa;
+  --accent: #111; /* black accent */
+  --accent-weak: #222;
+  --focus: #3b82f6; /* subtle blue focus ring */
+}
+
+/* Layout */
+.board-container {
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 0 16px;
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+.board-header {
+  margin-bottom: 16px;
+}
+
+.board-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.board-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 20px;
+}
+
+/* Table (list) */
+.board-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg);
+  border-top: 2px solid var(--accent);
+  border-bottom: 1px solid var(--line);
+}
+
+.board-table th,
+.board-table td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.board-table th {
+  background: var(--bg-soft);
+  font-weight: 600;
+}
+
+.board-table td.num,
+.board-table th.num { width: 80px; text-align: center; }
+.board-table td.author,
+.board-table th.author { width: 140px; text-align: center; }
+.board-table td.date,
+.board-table th.date { width: 140px; text-align: center; }
+.board-table td.views,
+.board-table th.views { width: 80px; text-align: center; }
+
+.board-table tr:hover td { background: #fcfcfc; }
+
+/* Title links */
+.board-link { color: var(--text); text-decoration: none; }
+.board-link:hover { text-decoration: underline; }
+
+/* Pagination */
+.board-paging { display: flex; gap: 6px; justify-content: center; margin: 18px 0 26px; }
+.board-page,
+.board-page-nav {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+}
+.board-page.is-active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.board-page:hover, .board-page-nav:hover { background: var(--bg-soft); }
+
+/* Buttons (write / edit / delete / back) */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 10px 18px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn:hover { background: var(--accent-weak); }
+.btn.outline { background: #fff; color: var(--accent); }
+.btn.outline:hover { background: var(--bg-soft); }
+
+.btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.btn-center { display: flex; justify-content: center; margin-top: 18px; }
+
+/* Forms (write/update/delete) */
+.board-form { width: 100%; max-width: 720px; margin: 0 auto; }
+.form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+.form-col { flex: 1; }
+
+.label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.input, .textarea, .password {
+    width: 100%;
+    border: 1px solid var(--line);
+    padding: 10px 12px;
+    font-size: 14px;
+    background: #fff;
+}
+.textarea { min-height: 180px; resize: vertical; }
+.input:focus, .textarea:focus, .password:focus { outline: 2px solid var(--focus); outline-offset: 0; }
+
+/* Form errors / flash messages */
+.form-error { color: #d32f2f; font-size: 13px; margin-top: 6px; }
+.flash { margin: 10px 0 16px; padding: 10px 12px; background: #f6ffed; border: 1px solid #b7eb8f; color: #2f6b0f; font-size: 13px; }
+.flash.error { background: #fff2f0; border-color: #ffccc7; color: #a8071a; }
+
+/* Detail (view) */
+.view-head { border-top: 2px solid var(--accent); border-bottom: 1px solid var(--line); padding: 14px 4px; }
+.view-title { font-size: 20px; font-weight: 700; margin: 0 0 8px; }
+.view-meta { display: flex; gap: 16px; color: var(--muted); font-size: 13px; }
+.view-body { padding: 18px 4px 24px; border-bottom: 1px solid var(--line); line-height: 1.7; }
+
+/* Utility */
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.right { text-align: right; }
+.center { text-align: center; }
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+    .board-table th:nth-child(1),
+    .board-table td:nth-child(1),
+    .board-table th.views,
+    .board-table td.views { display: none; }
+
+    .form-row { flex-direction: column; }
+    .board-container { margin: 24px auto; }
+}
+/* ===============================
+   Search bar (select + input + button)
+   =============================== */
+.board-search {
+    display: flex; justify-content: flex-end; gap: 0; margin-bottom: 20px;
+}
+.board-search .form-col { flex: none; }
+
+.board-search .select-col { width: 120px; }
+.board-search .input-col { width: 300px; }
+.board-search .btn-col   { width: 72px; }
+
+.board-search select.input,
+.board-search input.input,
+.board-search .btn { height: 40px; }
+
+.board-search select.input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+}
+.board-search select.input::-ms-expand {
+    display: none;
+}
+
+.board-search input.input {
+    border: 1px solid var(--line);
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    padding: 10px 12px;
+}
+
+.board-search .btn {
+    border: 1px solid var(--accent);
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+    padding: 0 16px;
+}
+
+.board-search select.input:focus,
+.board-search input.input:focus { outline: 2px solid var(--focus); outline-offset: 0; }
+.board-search .select-col select.input,
+.board-search .input-col input.input,
+.board-search .btn-col .btn { width: 100%; display: block; }
+
+.board-search select.input,
+.board-search input.input,
+.board-search .btn { box-sizing: border-box; }
+
+.board-search .input-col { position: relative; }
+.board-search input.input:focus { position: relative; z-index: 1; }
+
+/* ===============================
+   Table form (write/update)
+   =============================== */
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg);
+    border-top: 2px solid var(--accent);
+    border-bottom: 1px solid var(--line);
+    margin: 0 auto 12px;
+}
+.form-table th,
+.form-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    font-size: 14px;
+}
+.form-table th {
+    width: 140px;
+    background: var(--bg-soft);
+    text-align: left;
+    font-weight: 600;
+    color: var(--text);
+}
+.form-table td .input,
+.form-table td .textarea {
+    width: 100%;
+}
+.form-table td .textarea { min-height: 220px; }
+.form-table td .form-error { margin-top: 6px; }
+
+/* compact on small screens */
+@media (max-width: 640px) {
+    .form-table th { width: 96px; }
+}
+
+/* toolbar & size select */
+.board-toolbar { display:flex; justify-content:flex-start; align-items:center; margin:6px 0 8px; }
+.page-size-form { display:inline-flex; align-items:center; }
+.size-select { width:auto; min-width:50px; }
+.sr-only { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+
+/* simple pagination */
+.pagination { display:flex; justify-content:center; align-items:center; gap:6px; margin:14px 0; }
+.pagination .page-link { display:inline-block; padding:6px 10px; border:1px solid var(--line); border-radius:6px; text-decoration:none; }
+.pagination .page-link.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.pagination .page-link.disabled { pointer-events:none; opacity:0.5; }
+/* controls row: page size + search inline */
+.board-controls { display:flex; align-items:center; justify-content: space-between; gap:12px; margin-bottom: 12px; }
+.board-controls .page-size-form { display:flex; align-items:center; gap:6px; }
+.size-label { font-size: 13px; color: var(--muted); }
+
+/* compact square-ish select  */
+.size-select.compact { width: 20px; height: 28px; padding: 0 4px; text-align:center; }
+.size-select.compact option { text-align:center; }
+
+/* search form inline inside controls */
+.board-controls .board-search { display:flex; gap:0; margin-bottom:0; }
+.board-controls .board-search .select-col { width: 120px; }
+.board-controls .board-search .input-col { width: 300px; }
+.board-controls .board-search .btn-col   { width: 72px; }

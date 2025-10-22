@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>게시글 삭제</title>
+    <link rel="stylesheet" th:href="@{/css/board.css}" href="/css/board.css" />
+</head>
+<body>
+<div class="board-container">
+
+    <script th:if="${message}" th:inline="javascript">alert([[${message}]]);</script>
+
+    <div class="board-header">
+        <h1 class="board-title">게시글 삭제</h1>
+        <p class="board-desc">비밀번호를 입력하면 게시글이 삭제됩니다.</p>
+    </div>
+
+    <div class="flash error" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{'/board/delete'(id=${boardId})}" method="post" class="board-form">
+        <table class="form-table">
+            <tbody>
+            <tr>
+                <th scope="row">
+                    <label for="password">비밀번호</label>
+                </th>
+                <td>
+                    <input type="password" id="password" name="password" class="input" placeholder="삭제 확인용 비밀번호를 입력하세요" />
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="btn-row">
+            <button type="submit" class="btn">삭제</button>
+            <a class="btn outline" th:href="@{'/board/view'(id=${boardId})}" href="/board/view">취소</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

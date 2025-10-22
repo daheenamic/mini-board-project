@@ -1,0 +1,85 @@
+
+/* ===============================
+   Global Error Page Styles
+   404 / 500 / auth / 400 공용
+   =============================== */
+:root {
+  --text: #111;
+  --muted: #666;
+  --line: #e5e5e5;
+  --bg: #fff;
+  --bg-soft: #fafafa;
+  --accent: #111;
+  --accent-weak: #222;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.err-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.err-card {
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 28px 24px 22px;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.04);
+  text-align: center;
+}
+
+.err-code { font-size: 64px; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; }
+.err-title { font-size: 22px; margin: 6px 0 8px; }
+.err-desc { font-size: 14px; color: var(--muted); margin: 0 0 16px; }
+
+.err-flash {
+  display: inline-block;
+  margin: 6px 0 14px;
+  padding: 10px 12px;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #a8071a;
+  font-size: 13px;
+}
+
+.err-actions { display: flex; gap: 8px; justify-content: center; margin-top: 6px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 16px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover { background: var(--accent-weak); }
+.btn.outline { background: #fff; color: var(--accent); }
+.btn.outline:hover { background: var(--bg-soft); }
+.btn.ghost { background: #fff; border-color: var(--line); color: var(--text); }
+.btn.ghost:hover { background: var(--bg-soft); }
+
+.err-foot { margin-top: 16px; text-align: center; }
+.muted { color: var(--muted); font-size: 12px; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .err-code { font-size: 48px; }
+  .err-title { font-size: 20px; }
+}
