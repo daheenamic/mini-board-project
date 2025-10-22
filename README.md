@@ -1,6 +1,6 @@
 
 
-# 🧾 Mini Board Project (Spring Boot + Thymeleaf + MySQL)
+# 🧾 Mini Board Project
 
 간단한 CRUD 게시판 프로젝트로, Spring Boot 기반 MVC 구조와 Thymeleaf 템플릿 엔진을 사용하여 구현했습니다.  
 게시글 **등록/조회/수정/삭제**, **검색(제목/작성자)**, **페이징**, **전역 예외 처리** 등을 포함합니다.
