@@ -1,61 +1,61 @@
-name: Generate Changelog
+name: Generate changelog
 
 on:
+  # Run when a pull request is closed
+  pull_request:
+    types: [closed]
+
+  # Run when the "Create release" workflow is completed
+  workflow_run:
+    workflows: ["Create release"]  # Must match the name in release.yml
+    types:
+      - completed
+
+  # Allow manual execution of the workflow
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 permissions:
   contents: write
-
-concurrency:
-  group: changelog-${{ github.ref_name }}
-  cancel-in-progress: true
-
-env:
-  BASE_BRANCH: ${{ github.event.repository.default_branch }}
+  pull-requests: write
 
 jobs:
-  changelog:
+  generate-changelog:
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+
     steps:
-      - name: Checkout (full history)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0     
-          ref: ${{ github.event.repository.default_branch }}
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch the full Git history
 
+    - name: Get first tag
+      id: get_first_tag
+      run: |
+        # Find the latest semantic version tag (excluding v1)
+        latest_tag="$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -n1)"
+        echo "LATEST_TAG=${latest_tag}" >> "$GITHUB_ENV"
+        # The first tag is always set to v1.0.0
+        echo "FIRST_TAG=v1.0.0" >> "$GITHUB_ENV"
 
-      - name: Sync with remote default branch
-        run: |
-          git fetch origin
-          git checkout -B "$BASE_BRANCH" "origin/$BASE_BRANCH"
+    - name: Generate changelog
+      uses: janheinrichmerker/action-github-changelog-generator@v2.4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        futureRelease: ${{ github.event.release.tag_name || env.LATEST_TAG }}
+        output: CHANGELOG.md
+        sinceTag: ${{ env.FIRST_TAG }}  # Use a specific version tag like v1.0.0
+        # excludeTags: "v1,v2"  # Explicitly exclude certain tags
+        excludeTagsRegex: "^v[0-9]$"
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1'
-
-      - name: Install github_changelog_generator
-        run: gem install github_changelog_generator
-
-      - name: Generate CHANGELOG.md
-        run: |
-          github_changelog_generator \
-            --user ${{ github.repository_owner }} \
-            --project ${{ github.event.repository.name }} \
-            --token ${{ secrets.CHANGELOG_GITHUB_TOKEN }} \
-            --output CHANGELOG.md
-
-      - name: Auth for push
-        run: |
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
-
-      - name: Commit & Push CHANGELOG
-        run: |
-          git add CHANGELOG.md
-          git commit -m "docs: update changelog [skip ci]" || echo "No changes to commit"
-          git push origin "$BASE_BRANCH"
+    - name: Git Commit and Push
+      uses: somaz94/go-git-commit-action@v1
+      with:
+        repository: ${{ github.repository }}
+        branch: main
+        commit_message: "Update changelog"
+        user_email: "actions@github.com"
+        user_name: "GitHub Actions"
+        file_pattern: "CHANGELOG.md"
