@@ -30,7 +30,7 @@ jobs:
       - name: Sync with remote default branch
         run: |
           git fetch origin
-          git checkout -B "$BASE_BRANCH" "origin/$BASE_BRANCH"   # 로컬 브랜치를 원격 최신으로 강제로 맞춤
+          git checkout -B "$BASE_BRANCH" "origin/$BASE_BRANCH"
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
