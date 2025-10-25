@@ -13,16 +13,20 @@
 |---|----------------------|
 | JDK | 21                   |
 | Spring Boot | 3.5.6                |
-| Persistence | **Spring Data JDBC** |
+| Persistence | **Spring Data JPA (Hibernate)** |
 | View | Thymeleaf            |
 | DB | MySQL 8.0.43         |
 | Build | Gradle               |
-| Dependencies | Spring Web, Thymeleaf, Spring Data JDBC, Validation, Lombok, MySQL Connector |
+| Dependencies | Spring Web, Thymeleaf, Spring Data JPA, Lombok, MySQL Connector |
 | IDE | IntelliJ IDEA        |
 
 ---
 
 ## 📁 패키지 구조
+
+- `JdbcConfig.java` 삭제됨
+- `JpaConfig.java` 새로 추가됨
+- `BoardRepository.java`는 이제 `JpaRepository` 상속으로 변경
 
 ```
 src
@@ -33,7 +37,7 @@ src
 │   │           └── board
 │   │               ├── BoardApplication.java              # 메인 실행 클래스
 │   │               ├── config
-│   │               │   └── JdbcConfig.java                # JDBC Auditing 설정
+│   │               │   └── JpaConfig.java                 # JPA Auditing 설정
 │   │               ├── controller
 │   │               │   └── BoardController.java           # 요청 처리 (목록/등록/수정/삭제/검색)
 │   │               ├── domain
@@ -46,7 +50,7 @@ src
 │   │               │   ├── PasswordMismatchException.java # 비밀번호 불일치 예외
 │   │               │   └── GlobalExceptionHandler.java    # 전역 예외 처리 (@ControllerAdvice)
 │   │               ├── repository
-│   │               │   └── BoardRepository.java           # Spring Data JDBC 인터페이스
+│   │               │   └── BoardRepository.java           # Spring Data JPA 인터페이스
 │   │               ├── service
 │   │               │   └── BoardService.java              # 비즈니스 로직 (CRUD/검색/페이징)
 │   │               └── support
@@ -80,22 +84,6 @@ src
 
 ---
 
-## 🧱 DB 테이블
-
-```sql
-CREATE TABLE board (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-```
-
----
-
 ## 📄 SQL 문서 관리
 프로젝트의 DDL/DML SQL 스크립트는 `docs/sql/` 폴더에서 관리합니다.
 - `schema.sql`: 데이터베이스 및 테이블 생성문 (DDL)
@@ -105,11 +93,13 @@ CREATE TABLE board (
 ## 🧠 핵심 도메인 & DTO
 
 ### Board (domain)
-- 게시글 엔티티.
+- 게시글 JPA 엔티티 (`@Entity`)
 - 주요 메서드:
-  - `static Board from(BoardRequestDto dto)` : 요청 DTO → 엔티티 변환
-  - `boolean isPasswordMismatch(String inputPassword)` : 비밀번호 검증
-  - `void update(String name, String title, String content)` : 내용 수정
+    - `static Board from(BoardRequestDto dto)` : DTO → 엔티티 변환 (생성용)
+    - `void update(String name, String title, String content)` : 게시글 수정
+    - `boolean isPasswordMismatch(String inputPassword)` : 비밀번호 검증
+    - `void increaseViewCount()` : 조회수 증가
+- `@CreatedDate`, `@LastModifiedDate` 로 작성일·수정일 자동 관리
 
 ### BoardRequestDto (dto)
 - **등록/수정 요청용** DTO.
@@ -149,7 +139,7 @@ CREATE TABLE board (
 ```yaml
 spring:
   application:
-    name: springjdbc
+    name: miniBoardProject
   thymeleaf:
     cache: false
 
@@ -159,6 +149,15 @@ spring:
     password: board1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
   data:
     web:
       pageable:
@@ -166,68 +165,83 @@ spring:
 
 logging:
   level:
-    org.springframework.jdbc: DEBUG
+    org.hibernate.sql: debug
+    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.orm.jdbc.extract: trace
 ```
 ---
 
-## 🧩 JDBC Auditing 설정
+## 🧩 JPA Auditing 설정
 
-`JdbcConfig`에서 `@EnableJdbcAuditing` 활성화 및 `AuditorAware<String>` 빈 등록.
+`JpaConfig`에서 `@EnableJpaAuditing` 활성화 및 `AuditingEntityListener` 등록.
 
 ```java
+import java.awt.datatransfer.Clipboard;
+
 @Configuration
-@EnableJdbcAuditing
-public class JdbcConfig {
-    @Bean
-    public AuditorAware<String> auditorProvider() {
-        // 로그인 연동 전까지는 "SYSTEM"으로 기록
-        return () -> Optional.of("SYSTEM");
-    }
+@EnableJpaAuditing
+public class JpaConfig {
 }
 ```
 
-- 추후 Spring Security 연동 시 현재 로그인 사용자명으로 교체 가능합니다.
+- 엔티티(Clipboard)에 다음과 같이 적용
+
+```java
+@EntityListeners(AuditingEntityListener.class)
+public class Board {
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+}
+```
 
 ---
 
 ## 🧾 예외 처리
 
 - `@ControllerAdvice`로 전역 예외 매핑
-  - `BoardNotFoundException` → **404** (error/404.html)
-  - `PasswordMismatchException` → **인증 오류 페이지** (error/auth.html)
-  - `IllegalArgumentException` → **400** (error/400.html)
-  - `Exception` → **500** (error/500.html)
+- `BoardNotFoundException` → **404**(error/404.html)
+- `PasswordMismatchException` → **인증 오류 페이지**(error/auth.html)
+- `IllegalArgumentException` → **400**(error/400.html)
+- `Exception` → **500**(error/500.html)
 
 ---
 
-## 🚏 라우팅 요약
+## 🚏라우팅 요약
 
-| HTTP | URL                                            | 설명 |
+|HTTP |URL                                            |설명 |
 |---|------------------------------------------------|---|
-| GET | `/board/list`                                  | 목록 조회 (정렬/페이징) |
-| GET | `/board/view?id={id}`                          | 상세 조회 |
-| GET | `/board/writeForm`                             | 등록 폼 |
-| POST | `/board/write`                                 | 등록 처리 (`@Valid BoardRequestDto`) |
-| GET | `/board/updateForm?id={id}`                    | 수정 폼 |
-| POST | `/board/update`                                | 수정 처리 (비번 검증) |
-| GET | `/board/deleteForm?id={id}`                    | 삭제 폼 |
-| POST | `/board/delete`                                | 삭제 처리 (비번 검증) |
-| GET | `/board/search?type={title\|name}&keyword=...` | 검색 + 페이징 |
+|GET | `/board/list`                                  |목록 조회(정렬/페이징) |
+|GET | `/board/view?id={id}`                          |상세 조회 |
+|GET | `/board/writeForm`                             |등록 폼 |
+|POST | `/board/write`                                 |등록 처리(`@Valid BoardRequestDto`) |
+|GET | `/board/updateForm?id={id}`                    |수정 폼 |
+|POST | `/board/update`                                |수정 처리(비번 검증) |
+GET | `/board/deleteForm?id={id}`                    |삭제 폼 |
+|POST | `/board/delete`                                |삭제 처리(비번 검증) |
+|GET | `/board/search?type={title\|name}&keyword=...` |검색 +페이징 |
 
 ---
 
 ## 🧪 실행 방법
 
-1) **DB 생성** 및 테이블 생성
+1) **DB 생성**및 테이블 생성
 ```sql
--- 데이터베이스 생성 
-CREATE database boarddb;
+-- 데이터베이스 생성
+CREATE database
+boarddb;
 
 -- 사용자 생성
-CREATE USER 'board'@'%' IDENTIFIED by 'board1234';
+CREATE USER 'board'@'%'
+IDENTIFIED by 'board1234';
 
 -- 권한 부여
-GRANT ALL PRIVILEGES ON boarddb.* TO 'board'@'%';
+GRANT ALL
+PRIVILEGES ON
+boarddb .*TO 'board'@'%';
 FLUSH PRIVILEGES
       
 -- 위의 CREATE TABLE 실행
