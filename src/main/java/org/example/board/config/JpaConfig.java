@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 /**
  * Spring Data JPA Auditing 기능 설정 클래스
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-26
  */
 @Configuration
