@@ -1,10 +1,13 @@
 name: Generate Changelog
 
 on:
-  workflow_dispatch:    # 수동 실행
+  workflow_dispatch:
   push:
     tags:
-      - 'v*'            # 예: v1.0.0, v1.1.1 푸시할 때 자동 실행
+      - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
   changelog:
@@ -13,16 +16,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.1
+          ruby-version: '3.1'
 
       - name: Install github_changelog_generator
         run: gem install github_changelog_generator
 
-      - name: Generate CHANGELOG
+      - name: Generate CHANGELOG.md
         run: |
           github_changelog_generator \
             --user ${{ github.repository_owner }} \
@@ -30,10 +35,14 @@ jobs:
             --token ${{ secrets.CHANGELOG_GITHUB_TOKEN }} \
             --output CHANGELOG.md
 
-      - name: Commit & Push CHANGELOG
+      - name: Auth for push
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+
+      - name: Commit & Push CHANGELOG
+        run: |
           git add CHANGELOG.md
           git commit -m "docs: update changelog [skip ci]" || echo "No changes to commit"
           git push
