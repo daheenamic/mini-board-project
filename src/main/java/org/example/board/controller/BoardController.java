@@ -25,7 +25,7 @@ import org.example.board.support.SearchType;
 /**
  * 게시판(Board) Controller
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 @Controller
