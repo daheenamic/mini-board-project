@@ -9,15 +9,21 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: changelog-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  BASE_BRANCH: ${{ github.event.repository.default_branch }}
+
 jobs:
   changelog:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0  # 태그/전체 히스토리 필요
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -45,4 +51,8 @@ jobs:
         run: |
           git add CHANGELOG.md
           git commit -m "docs: update changelog [skip ci]" || echo "No changes to commit"
-          git push
+          # 원격 최신 가져와서 우리 커밋을 위에 재적용
+          git fetch origin $BASE_BRANCH
+          git pull --rebase origin $BASE_BRANCH || true
+          # 안전 푸시
+          git push origin HEAD:$BASE_BRANCH
