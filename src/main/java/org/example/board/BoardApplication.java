@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * 게시판(Board) Application
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 @SpringBootApplication

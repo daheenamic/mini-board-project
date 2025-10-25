@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 /**
  * 전역 예외 처리 클래스 (Global Exception Handler)
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 @ControllerAdvice

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 /**
  * 게시판(Board) 저장소
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 @Repository

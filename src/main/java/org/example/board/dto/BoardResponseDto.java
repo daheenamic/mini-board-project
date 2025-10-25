@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * 게시글 응답 DTO
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 @Data

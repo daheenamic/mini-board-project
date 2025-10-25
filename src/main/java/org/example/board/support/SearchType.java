@@ -5,7 +5,7 @@ import lombok.Getter;
 /**
  * 게시글 검색 타입 (SearchType)
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 @Getter

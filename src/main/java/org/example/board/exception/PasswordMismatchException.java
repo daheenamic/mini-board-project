@@ -5,7 +5,7 @@ import org.example.board.support.ErrorCode;
 /**
  * 암호가 일치하지 않을 때 발생하는 예외
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 public class PasswordMismatchException extends RuntimeException {

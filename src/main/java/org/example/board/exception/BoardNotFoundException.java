@@ -5,7 +5,7 @@ import org.example.board.support.ErrorCode;
 /**
  * 게시글을 찾을 수 없을 때 발생하는 예외
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 public class BoardNotFoundException extends RuntimeException {

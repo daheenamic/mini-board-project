@@ -3,7 +3,7 @@ package org.example.board.support;
 /**
  * 에러 코드 정의(enum)
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 public enum ErrorCode {

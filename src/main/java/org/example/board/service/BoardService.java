@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 게시판(Board) 서비스
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 @Service
