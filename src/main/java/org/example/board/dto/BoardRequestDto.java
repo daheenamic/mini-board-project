@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * 게시글 작성 요청 DTO
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 @Data
