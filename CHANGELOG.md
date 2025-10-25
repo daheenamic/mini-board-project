@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.1.1](https://github.com/daheenamic/mini-board-project/tree/v1.1.1) (2025-10-25)
+
+[Full Changelog](https://github.com/daheenamic/mini-board-project/compare/v1.1.0...v1.1.1)
+
 ## [v1.1.0](https://github.com/daheenamic/mini-board-project/tree/v1.1.0) (2025-10-25)
 
 [Full Changelog](https://github.com/daheenamic/mini-board-project/compare/93213ad5981d9e51ebe40b56fd49f8485507e67b...v1.1.0)
