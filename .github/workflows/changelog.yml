@@ -1,45 +1,52 @@
-name: Generate changelog
-on:
-  release:
-    types: [created, edited]
-  pull_request:
-    types: [closed]
-  workflow_dispatch:  
+name: Generate Changelog
 
-permissions: 
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
   contents: write
-  pull-requests: write
 
 jobs:
-  generate-changelog:
+  changelog:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        
-    - name: Get first tag
-      id: get_first_tag
-      run: |
-        latest_tag="$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -n1)"
-        echo "LATEST_TAG=${latest_tag}" >> "$GITHUB_ENV"
-        echo "FIRST_TAG=v1.0.0" >> "$GITHUB_ENV"
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.repository.default_branch }}
 
-    - name: Generate changelog
-      uses: janheinrichmerker/action-github-changelog-generator@v2.4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        futureRelease: ${{ github.event.release.tag_name || env.LATEST_TAG }}
-        output: CHANGELOG.md
-        sinceTag: ${{ env.FIRST_TAG }}
-        excludeTagsRegex: "^v[0-9]$"
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
 
-    - name: Git Commit and Push
-      uses: somaz94/go-git-commit-action@v1
-      with:
-        repository: ${{ github.repository }}
-        branch: main
-        commit_message: "Update changelog"
-        user_email: "actions@github.com"
-        user_name: "GitHub Actions"
-        file_pattern: "CHANGELOG.md"
+      - name: Install github_changelog_generator
+        run: gem install github_changelog_generator
+
+      - name: Generate CHANGELOG.md
+        run: |
+          github_changelog_generator \
+            --user ${{ github.repository_owner }} \
+            --project ${{ github.event.repository.name }} \
+            --token ${{ secrets.CHANGELOG_GITHUB_TOKEN }} \
+            --output CHANGELOG.md
+
+      - name: Auth for push
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+
+      - name: Commit & Push CHANGELOG (force-with-lease)
+        env:
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git add CHANGELOG.md
+          git commit -m "docs: update changelog [skip ci]" || echo "No changes to commit"
+          git fetch origin $BASE_BRANCH
+          git pull --rebase origin $BASE_BRANCH || true
+          git push --force-with-lease origin HEAD:$BASE_BRANCH
