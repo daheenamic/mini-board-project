@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 /**
  * 게시판(Board) 도메인 클래스
  *
- * @author jeongdahee
+ * @author dahee
  * @since 2025-10-21
  */
 @Entity
